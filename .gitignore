@@ -59,3 +59,7 @@ typings/
 
 # next.js build output
 .next
+
+# user folders
+02-async-await-sorter/messy
+02-async-await-sorter/sorted
