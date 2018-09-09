@@ -18,5 +18,8 @@
   "homepage": "https://github.com/valeriynefyodov/loftschool-nodejs-hw2#readme",
   "dependencies": {
     "yargs": "^12.0.2"
+  },
+  "devDependencies": {
+    "eslint-config-standard": "^12.0.0"
   }
 }
