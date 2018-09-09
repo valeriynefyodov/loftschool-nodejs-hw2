@@ -5,7 +5,7 @@ const fsPromises = fs.promises;
 const noSuchFileCode = 'ENOENT';
 const fileExistsCode = 'EEXIST';
 
-async function distributeFile(filepath, sortedDir) {
+async function distributeFile(filepath, sortedDir, shouldDelete) {
   try {
     const basename = path.basename(filepath),
       firstLetter = basename.charAt(0).toUpperCase(),
@@ -27,7 +27,7 @@ async function distributeFile(filepath, sortedDir) {
   }
 }
 
-async function sortDirectory(dirname, sortedDir) {
+async function sortDirectory(dirname, sortedDir, shouldDelete) {
   try {
     const dirContent = await fsPromises.readdir(dirname);
     
@@ -36,13 +36,17 @@ async function sortDirectory(dirname, sortedDir) {
       const fileStat = await fsPromises.lstat(filepath);
   
       if (fileStat.isDirectory()) {
-        await sortDirectory(filepath, sortedDir);
+        await sortDirectory(filepath, sortedDir, shouldDelete);
       } else {
         await distributeFile(filepath, sortedDir);
+
+        shouldDelete && await fsPromises.unlink(filepath);
       }
-    }
-    
-    return dirContent;
+    }   
+
+    shouldDelete && await fsPromises.rmdir(dirname);
+
+    return 0;
   } catch (err) {
     return new Error(err);
   }
@@ -66,11 +70,10 @@ async function sort(messyDir, sortedDir, shouldDelete) {
       throw new Error(`${messyDir} is not a directory!`)
     }
 
-    await sortDirectory(messyDir, sortedDir);
+    await sortDirectory(messyDir, sortedDir, shouldDelete);
     
-    return 'Success';
+    return 0;
   } catch (err) {
-    console.log(err);
     return new Error(err);
   }
 }
